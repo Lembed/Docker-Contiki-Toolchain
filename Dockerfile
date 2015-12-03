@@ -7,14 +7,14 @@ RUN export DEBIAN_FRONTEND=noninteractive
 # Tools
 RUN dpkg --add-architecture i386
 
-#https://github.com/contiki-os/contiki/wiki/Setup-contiki-toolchain-in-ubuntu-13.04
+# https://github.com/contiki-os/contiki/wiki/Setup-contiki-toolchain-in-ubuntu-13.04
 RUN sed -i -re 's/([a-z]{2}\.)?archive.ubuntu.com|security.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
 RUN apt-get update -y
 
 # install add-apt-repository and etc
 RUN apt-get install -y --no-install-recommends software-properties-common bzip2 wget multiarch-support git-core git make libncurses5-dev build-essential lrzsz
 
-#https://launchpad.net/~terry.guo/+archive/ubuntu/gcc-arm-embedded
+# https://launchpad.net/~terry.guo/+archive/ubuntu/gcc-arm-embedded
 RUN add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
 RUN apt-get update -y
 
@@ -54,7 +54,7 @@ RUN wget https://raw.githubusercontent.com/wiki/g-oikonomou/contiki-sensinode/fi
     rm -rf /tmp/sdcc sdcc.tar.gz && \
     sdcc --version
 
-## Clone and build cc65 when testing 6502 ports
+# Clone and build cc65 when testing 6502 ports
 RUN git clone https://github.com/cc65/cc65 /tmp/cc65 && \
     make -C /tmp/cc65 bin apple2enh atarixl c64 c128 && \
     make -C /tmp/cc65 avail && \
@@ -64,7 +64,8 @@ RUN git clone https://github.com/cc65/cc65 /tmp/cc65 && \
 # Install RL78 GCC toolchain
 RUN apt-get install -y libncurses5:i386 zlib1g:i386
 RUN wget http://adamdunkels.github.io/contiki-fork/gnurl78-v13.02-elf_1-2_i386.deb && \
-    dpkg -i gnurl78*.deb
+    dpkg -i gnurl78*.deb && \
+    rm -f gnurl78-v13.02-elf_1-2_i386.deb
 
 # Install NXP toolchain
 RUN wget http://simonduq.github.io/resources/ba-elf-gcc-4.7.4-part1.tar.bz2 && \
@@ -78,7 +79,10 @@ RUN wget http://simonduq.github.io/resources/ba-elf-gcc-4.7.4-part1.tar.bz2 && \
     cp -f -r /tmp/ba-elf-gcc /usr/ && \
     export PATH=/usr/ba-elf-gcc/bin:$PATH && \
     rm -rf /tmp/ba-elf-gcc* /tmp/jn516x-sdk* && \
-    ba-elf-gcc --version
+    ba-elf-gcc --version && \
+    rm -f ba-elf-gcc-4.7.4-part1.tar.bz2 && \
+    rm -f ba-elf-gcc-4.7.4-part2.tar.bz2 && \
+    rm -f jn516x-sdk-4163.tar.bz2
 
 # Compile cooja.jar only when it's going to be needed
 RUN apt-get install -y ant openjdk-7-jdk openjdk-7-jre

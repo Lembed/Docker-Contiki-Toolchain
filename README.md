@@ -5,7 +5,7 @@ A docker of contiki os development environment
 > fig up
 
 * run:
-> docker run -it dockerContiki bash
+> docker run -it contiki_contiki bash
 
 
 * Note: The dockerfile is base on
