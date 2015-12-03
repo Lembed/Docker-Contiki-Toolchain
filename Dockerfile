@@ -1,5 +1,4 @@
 #base on https://raw.githubusercontent.com/Lembed/Contiki-os/master/.travis.yml
-
 FROM ubuntu:13.04
 
 
@@ -20,15 +19,13 @@ RUN add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
 RUN apt-get update -y
 
 # Install doxygen
-RUN add-apt-repository ppa:libreoffice/libreoffice-4-4 -y  
-RUN apt-get -qq update
 RUN apt-get --no-install-suggests --no-install-recommends -qq install doxygen  &&  doxygen --version
 
 # Install msp430 toolchain
 RUN apt-get install -y lib32z1
 RUN wget http://simonduq.github.io/resources/mspgcc-4.7.2-compiled.tar.bz2 && \
     tar xjf mspgcc*.tar.bz2 -C /tmp/ && \
-    sudo cp -f -r /tmp/msp430/* /usr/local/ && \
+    cp -f -r /tmp/msp430/* /usr/local/ && \
     rm -rf /tmp/msp430 mspgcc*.tar.bz2 && \
     msp430-gcc --version
 
@@ -65,7 +62,6 @@ RUN git clone https://github.com/cc65/cc65 /tmp/cc65 && \
     cc65 --version
 
 # Install RL78 GCC toolchain
-RUN apt-get install -y libncurses5-dev
 RUN apt-get install -y libncurses5:i386 zlib1g:i386
 RUN wget http://adamdunkels.github.io/contiki-fork/gnurl78-v13.02-elf_1-2_i386.deb && \
     dpkg -i gnurl78*.deb
@@ -78,8 +74,8 @@ RUN wget http://simonduq.github.io/resources/ba-elf-gcc-4.7.4-part1.tar.bz2 && \
     tar xjf jn516x-sdk-*.tar.bz2 -C /tmp/jn516x-sdk && \
     tar xjf ba-elf-gcc-*part1.tar.bz2 -C /tmp/ba-elf-gcc && \
     tar xjf ba-elf-gcc-*part2.tar.bz2 -C /tmp/ba-elf-gcc && \
-    sudo cp -f -r /tmp/jn516x-sdk /usr/ && \
-    sudo cp -f -r /tmp/ba-elf-gcc /usr/ && \
+    cp -f -r /tmp/jn516x-sdk /usr/ && \
+    cp -f -r /tmp/ba-elf-gcc /usr/ && \
     export PATH=/usr/ba-elf-gcc/bin:$PATH && \
     rm -rf /tmp/ba-elf-gcc* /tmp/jn516x-sdk* && \
     ba-elf-gcc --version
@@ -89,7 +85,7 @@ RUN apt-get install -y ant openjdk-7-jdk openjdk-7-jre
 ENV JAVA_HOME /usr/lib/jvm/default-java
 ENV JAVA_TOOL_OPTIONS -Dfile.encoding=UTF8
 
-RUN git clone --recursive https://github.com/lembed/Contiki-os/
+RUN git clone --recursive https://github.com/Lembed/Contiki/
 
-WORKDIR Contiki-os
+WORKDIR Contiki
 RUN ant -q -f tools/cooja/build.xml jar
