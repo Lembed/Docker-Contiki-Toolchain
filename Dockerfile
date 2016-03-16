@@ -34,17 +34,17 @@ RUN apt-get -qq install binutils-avr gcc-avr gdb-avr avr-libc avrdude
 
 # Install 32-bit compatibility libraries
 RUN apt-get -qq install \
-  libc6:i386 \
-  libgcc1:i386 \
-  gcc-4.7-base:i386 \
-  libstdc++5:i386 \
-  libstdc++6:i386
+    libc6:i386 \
+    libgcc1:i386 \
+    gcc-4.7-base:i386 \
+    libstdc++5:i386 \
+    libstdc++6:i386
 
 # Install mainline ARM toolchain.
 RUN apt-get -qq install \
-  gcc-arm-none-eabi \
-  srecord && \
-  arm-none-eabi-gcc --version
+    gcc-arm-none-eabi \
+    srecord && \
+    arm-none-eabi-gcc --version
 
 # Install SDCC from a purpose-built bundle
 RUN apt-get install -y lib32stdc++6

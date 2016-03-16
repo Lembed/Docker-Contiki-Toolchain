@@ -1,0 +1,2 @@
+*.yml linguist-language=Shell
+Dockerfile.* linguist-language=Shell
