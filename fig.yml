@@ -1,4 +1,0 @@
-contiki:
-  build: .
-  volumes:
-   - /home/contiki:/Contiki
