@@ -2,11 +2,11 @@
 
 DOCKER_NAME=contiki-os-toolchain
 USER_NAME=root
-IMAGE_NAME=CONTIKI-OS-ENV
-DOCKER_PATH=`which docker.io || which docker`
+IMAGE_NAME=${DOCKER_NAME}
+DOCKER_PATH=`which docker`
 SSH_PATH=`which ssh`
-VOLUME_MOUNT=/home/${USER_NAME}/workspace/:/home/${USER_NAME}/workspace
-
+VOLUME_MOUNT=/home/${USER_NAME}/workspace/:/opt/Contiki
+EXPORT_PORT=3222
 
 launcher_start () {
 
@@ -38,6 +38,8 @@ check_ports () {
     echo "Launcher has detected that port ${1} is in use."
     echo ""   
     exit 1
+  else
+    echo " ${1} is not used !"
   fi
 }
 
@@ -74,7 +76,8 @@ usage () {
 
 # build the docker container
 doBuild () {
-	${DOCKER_PATH} build --tag ${IMAGE_NAME} .
+  echo "build docker ${IMAGE_NAME} .... "
+	${DOCKER_PATH} build -t=${IMAGE_NAME} .
 }
 
 
@@ -82,12 +85,14 @@ doBuild () {
 doStart () {
   check_ports ${EXPORT_PORT}
 
-  existing=`${DOCKER_PATH} ps | awk '{ print $1, $(NF) }' | grep " $DOCKER_NAME$" | awk '{ print $1 }'`
+  existing=`${DOCKER_PATH} ps | grep " $DOCKER_NAME$" | awk '{ print $1 }'`
 
   if [[ ! -z $existing ]]; then
      echo '${DOCKER_NAME} already running !'
-  else	 
-     ${DOCKER_PATH} run --name ${DOCKER_NAME} --publish ${EXPORT_PORT}:22 --volume ${VOLUME_MOUNT} ${IMAGE_NAME}
+  else
+    echo "start ${DOCKER_NAME} on ${EXPORT_PORT} with ${VOLUME_MOUNT}"
+    ${DOCKER_PATH} rm ${DOCKER_NAME}
+    ${DOCKER_PATH} run -it --name ${DOCKER_NAME} --publish ${EXPORT_PORT}:22 --volume ${VOLUME_MOUNT} ${IMAGE_NAME} bash
   fi
 
 }
@@ -99,7 +104,7 @@ doRestart () {
 }
 
 doEnter () {
-  existing=`${DOCKER_PATH} ps | awk '{ print $1, $(NF) }' | grep " $DOCKER_NAME$" | awk '{ print $1 }'`
+  existing=`${DOCKER_PATH} ps | grep " $DOCKER_NAME$" | awk '{ print $1 }'`
 
   if [[ ! -z $existing ]]; then
      exec ${DOCKER_PATH} exec -it ${DOCKER_NAME} /bin/bash
@@ -110,10 +115,13 @@ doEnter () {
 
 # stop the docker container
 doStop () {
-  existing=`${DOCKER_PATH} ps | awk '{ print $1, $(NF) }' | grep " $DOCKER_NAME$" | awk '{ print $1 }'`
-
+  existing=`${DOCKER_PATH} ps | grep " $DOCKER_NAME$" | awk '{ print $1 }'`
   if [[ ! -z $existing ]]; then
-	   ${DOCKER_PATH} stop -t 10 ${DOCKER_NAME}
+    echo "${existing} exist and going to stoped"
+	   ${DOCKER_PATH} stop ${existing}
+     ${DOCKER_PATH} rm ${DOCKER_NAME}
+  else
+    echo "${DOCKER_NAME} is not running"
   fi
 }
 
@@ -121,8 +129,11 @@ doStop () {
 # delete the docker container
 doDestroy () {
   doStop
-  $(docker rm ${DOCKER_NAME} && docker rmi ${IMAGE_NAME}) || (echo "${DOCKER_NAME} was not found" && exit 0)
-  exit 0
+  image=`${DOCKER_PATH} images | grep ${DOCKER_NAME} | awk '{ print $3 }'`
+  if [[ ! -z $image ]]; then
+    echo "destroy docker ${image}"
+    $(${DOCKER_PATH} rmi -f ${image})
+  fi
 }
 
 
@@ -144,30 +155,27 @@ launcher_start
   usage
 }
 
-while getopts 'build:rebuild:enter:restart:stop:destroy:' OPT; do
-	case $OPT in
-        build)
-    			doBuild
-    			;;
-        rebuild)
-          doRebuild
-          ;;
-    		enter)
-    			doEnter
-    			;;
-        restart)
-          doRestart
-          ;;
-    		stop)
-    			doStop
-    			;;
-        destroy)
-          doDestroy
-          ;;    	
-    		\?)
-    			doHelp
-			   ;;
-	esac
-done
 
-shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
+case $1 in
+  build)
+    doBuild
+    ;;
+  rebuild)
+    doRebuild
+    ;;
+  enter)
+    doEnter
+    ;;
+  restart)
+    doRestart
+    ;;
+  stop)
+    doStop
+    ;;
+  destroy)
+    doDestroy
+    ;;    	
+  \?)
+    usage
+		;;
+esac

@@ -96,4 +96,4 @@ RUN cd /opt && git clone --recursive https://github.com/Lembed/Contiki-Cortex.gi
 RUN mkdir -p /opt/Contiki
 WORKDIR /opt/Contiki
 
-RUN ant -q -f tools/cooja/build.xml jar
+# RUN ant -q -f tools/cooja/build.xml jar
