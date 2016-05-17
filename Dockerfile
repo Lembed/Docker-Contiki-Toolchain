@@ -89,7 +89,11 @@ RUN apt-get install -y ant openjdk-7-jdk openjdk-7-jre
 ENV JAVA_HOME /usr/lib/jvm/default-java
 ENV JAVA_TOOL_OPTIONS -Dfile.encoding=UTF8
 
-RUN git clone --recursive https://github.com/Lembed/Contiki/
 
-WORKDIR Contiki
+VOLUME ["/opt/Contiki"]
+
+RUN cd /opt && git clone --recursive https://github.com/Lembed/Contiki-Cortex.git Contiki
+RUN mkdir -p /opt/Contiki
+WORKDIR /opt/Contiki
+
 RUN ant -q -f tools/cooja/build.xml jar

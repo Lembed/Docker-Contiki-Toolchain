@@ -2,7 +2,7 @@
 
 DOCKER_NAME=contiki-os-toolchain
 USER_NAME=root
-IMAGE_NAME=image-$USER_NAME
+IMAGE_NAME=CONTIKI-OS-ENV
 DOCKER_PATH=`which docker.io || which docker`
 SSH_PATH=`which ssh`
 VOLUME_MOUNT=/home/${USER_NAME}/workspace/:/home/${USER_NAME}/workspace
