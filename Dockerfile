@@ -48,10 +48,10 @@ RUN apt-get -qq install \
 
 # Install SDCC from a purpose-built bundle
 RUN apt-get install -y lib32stdc++6
-RUN wget https://raw.githubusercontent.com/wiki/g-oikonomou/contiki-sensinode/files/sdcc.tar.gz && \
-    tar xzf sdcc.tar.gz -C /tmp/ && \
-    cp -f -r /tmp/sdcc/* /usr/local/ && \
-    rm -rf /tmp/sdcc sdcc.tar.gz && \
+RUN wget 'http://downloads.sourceforge.net/project/sdcc/sdcc-linux-x86/3.6.0/sdcc-3.6.0-i386-unknown-linux2.5.tar.bz2' && \
+    tar -jxf sdcc-3.6.0-i386-unknown-linux2.5.tar.bz2 -C /tmp/ && \
+    cp -f -r /tmp/sdcc-3.6.0/* /usr/local/ && \
+    rm -rf /tmp/sdcc-3.6.0 sdcc-3.6.0-i386-unknown-linux2.5.tar.bz2 && \
     sdcc --version
 
 # Clone and build cc65 when testing 6502 ports
